@@ -1,9 +1,9 @@
 'use client';
 
 import { Moon, Sun, Monitor } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useTheme } from '@/components/providers/theme-provider';
+import type { Theme } from '@/components/providers/theme-provider';
 import { cn } from '@/lib/utils';
-import { themeUtils } from '@/lib/theme';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,27 +18,8 @@ const themes = [
 ] as const;
 
 export function ThemeToggle() {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    const theme = themeUtils.get();
-    themeUtils.set(theme);
-    setMounted(true);
-
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = () => themeUtils.set(theme);
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, []);
-
-  if (!mounted) {
-    return <button className="inline-flex h-10 w-10 items-center justify-center rounded-md border bg-background p-2.5">
-      <Monitor className="h-5 w-5" />
-    </button>;
-  }
-
-  const currentTheme = themeUtils.get();
-  const CurrentIcon = themes.find(t => t.value === currentTheme)?.icon || Monitor;
+  const { theme, setTheme } = useTheme();
+  const CurrentIcon = themes.find(t => t.value === theme)?.icon || Monitor;
 
   return (
     <DropdownMenu>
@@ -51,10 +32,10 @@ export function ThemeToggle() {
         {themes.map(({ value, label, icon: Icon }) => (
           <DropdownMenuItem
             key={value}
-            onClick={() => themeUtils.set(value)}
+            onClick={() => setTheme(value)}
             className={cn(
               "flex items-center gap-2",
-              currentTheme === value && "bg-accent"
+              theme === value && "bg-accent"
             )}
           >
             <Icon className="h-4 w-4" />
