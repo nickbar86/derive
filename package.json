@@ -1,0 +1,60 @@
+{
+  "name": "@derivexyz/options-wizard-task",
+  "version": "1.0.0",
+  "private": true,
+  "author": "@earthtojake",
+  "scripts": {
+    "dev": "next",
+    "build": "next build",
+    "start": "next start",
+    "type-check": "tsc",
+    "lint": "eslint --ignore-path .gitignore \"**/*.+(ts|js|tsx|jsx)\"",
+    "format": "prettier --ignore-path .gitignore \"**/*.+(ts|js|tsx|jsx)\" --write",
+    "postinstall": "husky install"
+  },
+  "lint-staged": {
+    "./**/*.{ts,js,jsx,tsx}": [
+      "eslint --ignore-path .gitignore --fix",
+      "prettier --ignore-path .gitignore --write"
+    ]
+  },
+  "dependencies": {
+    "@radix-ui/react-dropdown-menu": "^2.1.6",
+    "@radix-ui/react-select": "^2.1.6",
+    "@radix-ui/react-separator": "^1.1.2",
+    "@tanstack/react-query": "^5.66.0",
+    "class-variance-authority": "^0.7.1",
+    "clsx": "^2.1.1",
+    "framer-motion": "^6",
+    "graphql-request": "^5.2.0",
+    "lucide-react": "^0.475.0",
+    "next": "15.1.6",
+    "next-themes": "^0.4.4",
+    "react": "18.1.0",
+    "react-dom": "18.1.0",
+    "tailwind-merge": "^3.0.1",
+    "tailwindcss-animate": "^1.0.7"
+  },
+  "devDependencies": {
+    "@types/node": "22.13.1",
+    "@types/react": "18",
+    "@types/react-dom": "18",
+    "@typescript-eslint/eslint-plugin": "5.25.0",
+    "@typescript-eslint/parser": "5.25.0",
+    "autoprefixer": "^10.4.20",
+    "eslint": "^9",
+    "eslint-config-next": "12.1.6",
+    "eslint-config-prettier": "8.5.0",
+    "eslint-import-resolver-typescript": "2.7.1",
+    "eslint-plugin-prettier": "4.0.0",
+    "eslint-plugin-react-hooks": "^4.5.0",
+    "eslint-plugin-simple-import-sort": "^7.0.0",
+    "eslint-plugin-unused-imports": "^2.0.0",
+    "husky": "8.0.1",
+    "lint-staged": "12.4.1",
+    "postcss": "^8.5.1",
+    "prettier": "2.6.2",
+    "tailwindcss": "3.4.17",
+    "typescript": "^5.7.3"
+  }
+}
