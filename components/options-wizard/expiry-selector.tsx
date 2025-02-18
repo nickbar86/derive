@@ -1,21 +1,20 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { Skeleton } from '../ui/skeleton'
 import formatDate from '@/lib/format-date'
-import { useCurrencies, useInstruments } from '@/hooks'
+import { useOptionsWizard } from './context'
 
 export function ExpirySelector() {
-  const { currencies, selectedCurrency } = useCurrencies()
-  const selectedCurrencyData = currencies.find(c => c.currency === selectedCurrency)
-  const spotPrice = selectedCurrencyData ? Number(selectedCurrencyData.spot_price) : 0
-
   const { 
-    instruments, 
-    isLoading: isLoadingInstruments, 
-    selectedExpiry, 
+    selectedCurrency,
+    spotPrice,
+    instruments,
+    isLoading: isLoadingInstruments,
+    selectedExpiry,
     setSelectedExpiry,
-    selectedStrike,
     setSelectedStrike
-  } = useInstruments(selectedCurrency, spotPrice)
+  } = useOptionsWizard()
+
+  const isDisabled = !selectedCurrency || instruments.expiryDates.length === 0
 
   // Handle expiry change and auto-select closest strike to spot price
   const handleExpiryChange = (expiry: string) => {
@@ -35,14 +34,26 @@ export function ExpirySelector() {
     <div>
       <div className="flex flex-col gap-1 mb-1.5">
         <label className="font-medium">3. Pick your timeframe</label>
-        <p className="text-sm text-muted-foreground">When do you expect to reach your target?</p>
+        <p className="text-sm text-muted-foreground">
+          {!selectedCurrency 
+            ? 'Select a currency first'
+            : 'When do you expect to reach your target?'}
+        </p>
       </div>
       {isLoadingInstruments ? (
         <Skeleton className="h-10 w-full rounded-md" />
       ) : (
-        <Select value={selectedExpiry} onValueChange={handleExpiryChange}>
+        <Select 
+          value={selectedExpiry} 
+          onValueChange={handleExpiryChange}
+          disabled={isDisabled}
+        >
           <SelectTrigger>
-            <SelectValue placeholder="Select expiry date" />
+            <SelectValue placeholder={
+              !selectedCurrency 
+                ? "Select currency first"
+                : "Select expiry date"
+            } />
           </SelectTrigger>
           <SelectContent 
             position="popper" 

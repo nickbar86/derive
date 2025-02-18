@@ -1,29 +1,50 @@
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { Skeleton } from '../ui/skeleton'
 import formatUSD from '@/lib/format-usd'
-import { useCurrencies, useInstruments } from '@/hooks'
+import { useOptionsWizard } from './context'
 
 export function StrikeSelector() {
-  const { currencies, selectedCurrency } = useCurrencies()
-  const selectedCurrencyData = currencies.find(c => c.currency === selectedCurrency)
-  const spotPrice = selectedCurrencyData ? Number(selectedCurrencyData.spot_price) : 0
+  const { 
+    selectedCurrency,
+    spotPrice,
+    instruments,
+    isLoading: isLoadingInstruments,
+    selectedExpiry,
+    selectedStrike,
+    setSelectedStrike
+  } = useOptionsWizard()
 
-  const { instruments, isLoading: isLoadingInstruments, selectedExpiry, selectedStrike, setSelectedStrike } = useInstruments(selectedCurrency, spotPrice)
+  const availableStrikes = selectedExpiry ? instruments.strikesByExpiry[selectedExpiry] || [] : []
+  const isDisabled = !selectedCurrency || !selectedExpiry || availableStrikes.length === 0
 
   return (
     <div>
       <div className="flex flex-col gap-1 mb-1.5">
         <label className="font-medium">2. Choose your target price</label>
         <p className="text-sm text-muted-foreground">
-          {spotPrice ? `Current price: ${formatUSD(spotPrice)}` : 'Select a currency first'}
+          {!selectedCurrency 
+            ? 'Select a currency first'
+            : !selectedExpiry
+            ? 'Select an expiry date first'
+            : `Current price: ${formatUSD(spotPrice)}`}
         </p>
       </div>
       {isLoadingInstruments ? (
         <Skeleton className="h-10 w-full rounded-md" />
       ) : (
-        <Select value={selectedStrike} onValueChange={(value: string) => setSelectedStrike(value)}>
+        <Select 
+          value={selectedStrike} 
+          onValueChange={(value: string) => setSelectedStrike(value)}
+          disabled={isDisabled}
+        >
           <SelectTrigger>
-            <SelectValue placeholder="Select strike price" />
+            <SelectValue placeholder={
+              !selectedCurrency 
+                ? "Select currency first" 
+                : !selectedExpiry 
+                ? "Select expiry first"
+                : "Select strike price"
+            } />
           </SelectTrigger>
           <SelectContent 
             position="popper" 
@@ -31,11 +52,11 @@ export function StrikeSelector() {
             align="start"
             className="max-h-[var(--radix-select-content-available-height)] min-w-[var(--radix-select-trigger-width)]"
           >
-            {instruments.strikesByExpiry[selectedExpiry]?.map((strike: string) => (
+            {availableStrikes.map((strike: string) => (
               <SelectItem key={strike} value={strike}>
                 {formatUSD(Number(strike))}
               </SelectItem>
-            )) || []}
+            ))}
           </SelectContent>
         </Select>
       )}

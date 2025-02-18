@@ -1,18 +1,17 @@
 import { Skeleton } from '../ui/skeleton'
 import formatUSD from '@/lib/format-usd'
-import { useCurrencies, useInstruments, useTicker } from '@/hooks'
+import { useTicker } from '@/hooks'
+import { useOptionsWizard } from './context'
 
 export function RecommendedOption() {
-  const { currencies, selectedCurrency } = useCurrencies()
-  const selectedCurrencyData = currencies.find(c => c.currency === selectedCurrency)
-  const spotPrice = selectedCurrencyData ? Number(selectedCurrencyData.spot_price) : 0
-
   const { 
-    instruments, 
+    selectedCurrency,
+    spotPrice,
+    instruments,
     isLoading: isLoadingInstruments,
     selectedExpiry,
     selectedStrike
-  } = useInstruments(selectedCurrency, spotPrice)
+  } = useOptionsWizard()
 
   const { ticker, isLoading: isLoadingTicker } = useTicker(
     selectedCurrency,

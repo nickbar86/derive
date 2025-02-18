@@ -4,6 +4,7 @@ import React from 'react'
 import { ThemeToggle } from '../components/ui/theme-toggle'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { CurrencySelector, StrikeSelector, ExpirySelector, RecommendedOption } from '@/components/options-wizard'
+import { OptionsWizardProvider } from '@/components/options-wizard/context'
 
 export default function Home() {
   return (
@@ -11,18 +12,20 @@ export default function Home() {
       <div className="absolute top-4 right-4">
         <ThemeToggle />
       </div>
-      <Card className="w-[400px] relative">
-        <CardHeader>
-          <CardTitle>Options Wizard</CardTitle>
-          <CardDescription>Build your perfect option in three simple steps.</CardDescription>
-        </CardHeader>
-        <CardContent className="flex flex-col gap-6">
-          <CurrencySelector />
-          <StrikeSelector />
-          <ExpirySelector />
-          <RecommendedOption />
-        </CardContent>
-      </Card>
+      <OptionsWizardProvider>
+        <Card className="w-[400px]">
+          <CardHeader>
+            <CardTitle>Options Wizard</CardTitle>
+            <CardDescription>Build your perfect option in three simple steps.</CardDescription>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-6">
+            <CurrencySelector />
+            <StrikeSelector />
+            <ExpirySelector />
+            <RecommendedOption />
+          </CardContent>
+        </Card>
+      </OptionsWizardProvider>
     </div>
   )
 }
