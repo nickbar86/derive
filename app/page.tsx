@@ -1,34 +1,28 @@
 'use client'
 
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { ThemeToggle } from '../components/ui/theme-toggle'
-import fetchAllCurrencies from 'lib/api/fetch-all-currencies'
-import { CurrencyResponseSchema } from 'types/public.get_all_currencies'
-import { OptionsWizardCard } from '@/components/options-wizard-card'
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import { CurrencySelector, StrikeSelector, ExpirySelector, RecommendedOption } from '@/components/options-wizard'
 
 export default function Home() {
-  const [currencies, setCurrencies] = useState<CurrencyResponseSchema[]>([])
-  const [selectedCurrency, setSelectedCurrency] = useState<string>('BTC')
-
-  useEffect(() => {
-    const fetch = async () => {
-      const { result } = await fetchAllCurrencies()
-      const filteredResult = result.filter(c => ['BTC', 'ETH'].includes(c.currency))
-      setCurrencies(filteredResult)
-    }
-    fetch()
-  }, [])
-
   return (
     <div className="min-h-screen flex flex-col justify-center items-center">
       <div className="absolute top-4 right-4">
         <ThemeToggle />
       </div>
-      <OptionsWizardCard 
-        currencies={currencies}
-        selectedCurrency={selectedCurrency}
-        onCurrencyChange={setSelectedCurrency}
-      />
+      <Card className="w-[400px] relative">
+        <CardHeader>
+          <CardTitle>Options Wizard</CardTitle>
+          <CardDescription>Build your perfect option in three simple steps.</CardDescription>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-6">
+          <CurrencySelector />
+          <StrikeSelector />
+          <ExpirySelector />
+          <RecommendedOption />
+        </CardContent>
+      </Card>
     </div>
   )
 }
