@@ -13,22 +13,20 @@ export default function Home() {
         <ThemeToggle />
       </div>
       <OptionsWizardProvider>
-        <Card className="w-full max-w-[1000px]">
+        <Card className="w-full max-w-[1200px]">
           <CardHeader>
             <CardTitle>Options Wizard</CardTitle>
             <CardDescription>Build your perfect option in three simple steps.</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="flex flex-col gap-6">
+              <div className="flex flex-col space-y-6">
                 <CurrencySelector />
                 <StrikeSelector />
                 <ExpirySelector />
                 <RecommendedOption />
               </div>
-              <div className="flex flex-col gap-6">
-                <PayoffMatrix />
-              </div>
+              <PayoffMatrix />
             </div>
           </CardContent>
         </Card>

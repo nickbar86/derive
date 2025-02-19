@@ -48,27 +48,34 @@ export function RecommendedOption() {
   const recommendedInstrument = recommendedInstrumentName ? instruments.byName[recommendedInstrumentName] : null
 
   if (!isLoadingInstruments && !isLoadingTicker && !recommendedInstrument) {
-    return null
+    return (
+      <div className="mt-2 p-4 bg-muted rounded-lg h-[170px]">
+        <h3 className="font-medium mb-2">Recommended Option</h3>
+        <div className="flex flex-col gap-2">
+          <div className="h-[76px]" />
+        </div>
+      </div>
+    )
   }
 
   return (
-    <div className="mt-2 p-4 bg-muted rounded-lg">
+    <div className="mt-2 p-4 bg-muted rounded-lg h-[170px]">
       <h3 className="font-medium mb-2">Recommended Option</h3>
       <div className="flex flex-col gap-2">
         {(isLoadingInstruments || isLoadingTicker) ? (
           <>
             <div className="space-y-2">
-              <Skeleton data-testid="loading-skeleton" className="h-6 w-full" />
-              <Skeleton data-testid="loading-skeleton" className="h-4 w-[80%]" />
+              <Skeleton className="h-5 w-full" />
+              <Skeleton className="h-4 w-[90%]" />
             </div>
             <div className="mt-2 grid grid-cols-2 gap-2">
               <div className="p-2 bg-background rounded space-y-1">
-                <Skeleton data-testid="loading-skeleton" className="h-4 w-16" />
-                <Skeleton data-testid="loading-skeleton" className="h-4 w-20" />
+                <Skeleton className="h-4 w-16" /> {/* Best Bid: */}
+                <Skeleton className="h-4 w-20" /> {/* Price */}
               </div>
               <div className="p-2 bg-background rounded space-y-1">
-                <Skeleton data-testid="loading-skeleton" className="h-4 w-16" />
-                <Skeleton data-testid="loading-skeleton" className="h-4 w-20" />
+                <Skeleton className="h-4 w-16" /> {/* Best Ask: */}
+                <Skeleton className="h-4 w-20" /> {/* Price */}
               </div>
             </div>
           </>
@@ -88,11 +95,11 @@ export function RecommendedOption() {
             </p>
             {ticker && (
               <div className="mt-2 grid grid-cols-2 gap-2 text-sm">
-                <div className="p-2 bg-background rounded">
+                <div className="p-2 bg-background rounded space-y-1">
                   <span className="text-muted-foreground">Best Bid:</span>
                   <span className="ml-2">{formatUSD(Number(ticker.best_bid_price))}</span>
                 </div>
-                <div className="p-2 bg-background rounded">
+                <div className="p-2 bg-background rounded space-y-1">
                   <span className="text-muted-foreground">Best Ask:</span>
                   <span className="ml-2">{formatUSD(Number(ticker.best_ask_price))}</span>
                 </div>
