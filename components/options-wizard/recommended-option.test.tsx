@@ -75,7 +75,7 @@ describe('RecommendedOption', () => {
     expect(skeletons.length).toBeGreaterThan(0)
   })
 
-  it('renders nothing when no recommended instrument and not loading', () => {
+  it('renders empty container when no recommended instrument and not loading', () => {
     mockUseOptionsWizard.mockReturnValue({
       ...mockUseOptionsWizard(),
       selectedStrike: '',
@@ -87,8 +87,8 @@ describe('RecommendedOption', () => {
       isLoading: false
     } as any)
 
-    const { container } = render(<RecommendedOption />)
-    expect(container).toBeEmptyDOMElement()
+    render(<RecommendedOption />)
+    expect(screen.getByTestId('empty-container')).toBeInTheDocument()
   })
 
   it('renders call option recommendation', () => {

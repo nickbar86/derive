@@ -52,7 +52,7 @@ export function RecommendedOption() {
       <div className="mt-2 p-4 bg-muted rounded-lg h-[170px]">
         <h3 className="font-medium mb-2">Recommended Option</h3>
         <div className="flex flex-col gap-2">
-          <div className="h-[76px]" />
+          <div className="h-[76px]" data-testid="empty-container" />
         </div>
       </div>
     )
@@ -65,17 +65,17 @@ export function RecommendedOption() {
         {(isLoadingInstruments || isLoadingTicker) ? (
           <>
             <div className="space-y-2">
-              <Skeleton className="h-5 w-full" />
-              <Skeleton className="h-4 w-[90%]" />
+              <Skeleton className="h-5 w-full" data-testid="loading-skeleton" />
+              <Skeleton className="h-4 w-[90%]" data-testid="loading-skeleton" />
             </div>
             <div className="mt-2 grid grid-cols-2 gap-2">
               <div className="p-2 bg-background rounded space-y-1">
-                <Skeleton className="h-4 w-16" /> {/* Best Bid: */}
-                <Skeleton className="h-4 w-20" /> {/* Price */}
+                <Skeleton className="h-4 w-16" data-testid="loading-skeleton" /> {/* Best Bid: */}
+                <Skeleton className="h-4 w-20" data-testid="loading-skeleton" /> {/* Price */}
               </div>
               <div className="p-2 bg-background rounded space-y-1">
-                <Skeleton className="h-4 w-16" /> {/* Best Ask: */}
-                <Skeleton className="h-4 w-20" /> {/* Price */}
+                <Skeleton className="h-4 w-16" data-testid="loading-skeleton" /> {/* Best Ask: */}
+                <Skeleton className="h-4 w-20" data-testid="loading-skeleton" /> {/* Price */}
               </div>
             </div>
           </>
