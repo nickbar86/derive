@@ -5,6 +5,7 @@ import fetchAllCurrencies from '@/lib/api/fetch-all-currencies'
 export function useCurrencies() {
   const [currencies, setCurrencies] = useState<SupportedCurrencyResponse[]>([])
   const [selectedCurrency, setSelectedCurrency] = useState<SupportedCurrency>('BTC')
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     fetchAllCurrencies().then(({ result }) => {
@@ -12,12 +13,14 @@ export function useCurrencies() {
         isSupportedCurrency(c.currency)
       )
       setCurrencies(filteredResult)
+      setIsLoading(false)
     })
   }, [])
 
   return {
     currencies,
     selectedCurrency,
-    setSelectedCurrency
+    setSelectedCurrency,
+    isLoading
   }
 } 

@@ -2,9 +2,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { SupportedCurrency } from '@/types/currencies'
 import formatUSD from '@/lib/format-usd'
 import { useOptionsWizard } from './context'
+import { Skeleton } from '../ui/skeleton'
 
 export function CurrencySelector() {
-  const { currencies, selectedCurrency, setSelectedCurrency, spotPrice } = useOptionsWizard()
+  const { currencies, selectedCurrency, setSelectedCurrency, spotPrice, isLoading } = useOptionsWizard()
   const selectedCurrencyData = currencies.find(c => c.currency === selectedCurrency)
   const priceChange = selectedCurrencyData
     ? Number(selectedCurrencyData.spot_price) - Number(selectedCurrencyData.spot_price_24h)
@@ -13,6 +14,18 @@ export function CurrencySelector() {
     selectedCurrencyData
       ? ((priceChange / Number(selectedCurrencyData.spot_price_24h)) * 100).toFixed(2)
       : '0'
+
+  if (isLoading) {
+    return (
+      <div>
+        <div className="flex items-baseline justify-between mb-1.5">
+          <label className="font-medium">1. Select your currency</label>
+          <Skeleton className="h-4 w-24" data-testid="loading-skeleton" />
+        </div>
+        <Skeleton className="h-10 w-full" data-testid="loading-skeleton" />
+      </div>
+    )
+  }
 
   return (
     <div>

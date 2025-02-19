@@ -27,7 +27,8 @@ describe('CurrencySelector', () => {
       currencies: mockCurrencies,
       selectedCurrency: 'BTC',
       setSelectedCurrency: mockSetSelectedCurrency,
-      spotPrice: '50000'
+      spotPrice: '50000',
+      isLoading: false
     } as any)
   })
 
@@ -92,5 +93,19 @@ describe('CurrencySelector', () => {
 
     render(<CurrencySelector />)
     expect(screen.getByTestId('price-change')).toHaveTextContent('24h change: $0.00')
+  })
+
+  it('renders loading skeletons when loading', () => {
+    mockUseOptionsWizard.mockReturnValue({
+      currencies: [],
+      selectedCurrency: 'BTC',
+      setSelectedCurrency: mockSetSelectedCurrency,
+      spotPrice: '50000',
+      isLoading: true
+    } as any)
+
+    render(<CurrencySelector />)
+    const skeletons = screen.getAllByTestId('loading-skeleton')
+    expect(skeletons).toHaveLength(2)
   })
 }) 
