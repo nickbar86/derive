@@ -283,7 +283,7 @@ describe('findNearestExpiryAndStrike', () => {
 
     const result = findNearestExpiryAndStrike(expiryDates, strikesByExpiry, spotPrice)
     expect(result).toEqual({
-      expiry: '1644900000',
+      expiry: '1644900000', 
       strike: '11000'
     })
   })
