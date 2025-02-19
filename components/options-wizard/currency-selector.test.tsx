@@ -6,6 +6,13 @@ import { useOptionsWizard } from './context'
 jest.mock('./context')
 const mockUseOptionsWizard = useOptionsWizard as jest.MockedFunction<typeof useOptionsWizard>
 
+// Mock lucide-react icons
+jest.mock('lucide-react', () => ({
+  Check: () => null,
+  ChevronDown: () => null,
+  ChevronUp: () => null
+}))
+
 describe('CurrencySelector', () => {
   const mockCurrencies = [
     { currency: 'BTC', spot_price: '50000', spot_price_24h: '49000' },
