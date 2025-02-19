@@ -19,7 +19,7 @@ export function CurrencySelector() {
       <div className="flex items-baseline justify-between mb-1.5">
         <label className="font-medium">1. Select your currency</label>
         {selectedCurrencyData && (
-          <p className="text-sm text-muted-foreground">
+          <p data-testid="price-change" className="text-sm text-muted-foreground">
             24h change: {formatUSD(priceChange)}
           </p>
         )}
@@ -37,20 +37,25 @@ export function CurrencySelector() {
           align="start"
           className="max-h-[var(--radix-select-content-available-height)] min-w-[var(--radix-select-trigger-width)]"
         >
-          {currencies.map(currency => (
-            <SelectItem key={currency.currency} value={currency.currency}>
-              <div className="flex justify-between w-full">
-                <div className="flex gap-2">
-                  <span>{currency.currency}</span>
-                  <span>{formatUSD(Number(currency.spot_price))}</span>
+          {currencies.map(currency => {
+            const currencyPriceChange = Number(currency.spot_price) - Number(currency.spot_price_24h)
+            const currencyPercentageChange = ((currencyPriceChange / Number(currency.spot_price_24h)) * 100).toFixed(2)
+            
+            return (
+              <SelectItem key={currency.currency} value={currency.currency}>
+                <div className="flex justify-between w-full">
+                  <div className="flex gap-2">
+                    <span>{currency.currency}</span>
+                    <span>{formatUSD(Number(currency.spot_price))}</span>
+                  </div>
+                  <span data-testid={`price-change-${currency.currency}`}>
+                    {Number(currency.spot_price) > Number(currency.spot_price_24h) ? '↑' : '↓'} 
+                    {currencyPercentageChange}%
+                  </span>
                 </div>
-                <span>
-                  {Number(currency.spot_price) > Number(currency.spot_price_24h) ? '↑' : '↓'} 
-                  {priceChangePercent}%
-                </span>
-              </div>
-            </SelectItem>
-          ))}
+              </SelectItem>
+            )
+          })}
         </SelectContent>
       </Select>
     </div>
