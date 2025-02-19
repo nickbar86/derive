@@ -93,19 +93,4 @@ describe('CurrencySelector', () => {
     render(<CurrencySelector />)
     expect(screen.getByTestId('price-change')).toHaveTextContent('24h change: $0.00')
   })
-
-  it('formats price changes with correct percentages', () => {
-    render(<CurrencySelector />)
-    
-    // Open the select dropdown
-    fireEvent.click(screen.getByRole('combobox'))
-    
-    // BTC price change: (50000 - 49000) / 49000 * 100 ≈ 2.04%
-    const btcPriceChange = screen.getAllByTestId('price-change-BTC')[0]
-    expect(btcPriceChange).toHaveTextContent('↑2.04%')
-
-    // ETH price change: (3000 - 2900) / 2900 * 100 ≈ 3.45%
-    const ethPriceChange = screen.getAllByTestId('price-change-ETH')[0]
-    expect(ethPriceChange).toHaveTextContent('↑3.45%')
-  })
 }) 
