@@ -3,6 +3,25 @@ import { PublicGetTickerResultSchema } from '@/types/public.get_ticker'
 import { SupportedCurrency } from '@/types/currencies'
 import fetchTicker from '@/lib/api/get-ticker'
 import { InstrumentsMap } from './use-instruments'
+import { formatDateYYYYMMDD } from '@/lib/format-date'
+
+const fetchTickerData = async (
+  instrumentName: string,
+  onSuccess: (data: PublicGetTickerResultSchema) => void,
+  onError: () => void,
+  isCanceled: () => boolean
+) => {
+  try {
+    const { result } = await fetchTicker({ instrument_name: instrumentName })
+    if (!isCanceled()) {
+      onSuccess(result)
+    }
+  } catch (error) {
+    if (!isCanceled()) {
+      onError()
+    }
+  }
+}
 
 export function useTicker(
   selectedCurrency: SupportedCurrency,
@@ -23,17 +42,9 @@ export function useTicker(
     const strikePrice = Number(selectedStrike)
     const isCall = strikePrice > spotPrice
 
-    // Convert expiry from unix timestamp to YYYYMMDD format
-    const date = new Date(Number(selectedExpiry) * 1000)
-    const year = date.getUTCFullYear()
-    const month = String(date.getUTCMonth() + 1).padStart(2, '0')
-    const day = String(date.getUTCDate()).padStart(2, '0')
-    const formattedExpiry = `${year}${month}${day}`
-    
-    // Format strike price without decimals
+    const formattedExpiry = formatDateYYYYMMDD(Number(selectedExpiry))
     const formattedStrike = String(strikePrice)
     
-    // Construct the instrument name with the correct format
     const instrumentName = `${selectedCurrency}-${formattedExpiry}-${formattedStrike}-${isCall ? 'C' : 'P'}`
     const instrument = instruments.byName[instrumentName]
     
@@ -45,19 +56,22 @@ export function useTicker(
     let isCanceled = false
     setIsLoading(true)
 
-    fetchTicker({ instrument_name: instrument.instrument_name })
-      .then(({ result }) => {
-        if (isCanceled) return
-        setTicker(result)
-      })
-      .catch(() => {
-        if (isCanceled) return
-        setTicker(undefined)
-      })
-      .finally(() => {
-        if (isCanceled) return
-        setIsLoading(false)
-      })
+    const handleSuccess = (result: PublicGetTickerResultSchema) => {
+      setTicker(result)
+      setIsLoading(false)
+    }
+
+    const handleError = () => {
+      setTicker(undefined)
+      setIsLoading(false)
+    }
+
+    fetchTickerData(
+      instrument.instrument_name,
+      handleSuccess,
+      handleError,
+      () => isCanceled
+    )
 
     return () => {
       isCanceled = true
