@@ -30,7 +30,7 @@ describe('StrikeSelector', () => {
         expiryDates: mockExpiryDates,
         strikesByExpiry: mockStrikesByExpiry
       },
-      isLoading: false,
+      isLoadingInstruments: false,
       selectedExpiry: '1710979200',
       selectedStrike: '',
       setSelectedStrike: mockSetSelectedStrike
@@ -46,7 +46,7 @@ describe('StrikeSelector', () => {
   it('shows loading state', () => {
     mockUseOptionsWizard.mockReturnValue({
       ...mockUseOptionsWizard(),
-      isLoading: true
+      isLoadingInstruments: true
     } as any)
 
     render(<StrikeSelector />)
@@ -72,7 +72,7 @@ describe('StrikeSelector', () => {
 
     render(<StrikeSelector />)
     expect(screen.getByRole('combobox')).toBeDisabled()
-    expect(screen.getByText('Select an expiry date first')).toBeInTheDocument()
+    expect(screen.getByText('Select expiry first')).toBeInTheDocument()
   })
 
   it('shows disabled state when no strikes available', () => {

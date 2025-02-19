@@ -8,7 +8,7 @@ export function ExpirySelector() {
     selectedCurrency,
     spotPrice,
     instruments,
-    isLoading: isLoadingInstruments,
+    isLoadingInstruments,
     selectedExpiry,
     setSelectedExpiry,
     setSelectedStrike

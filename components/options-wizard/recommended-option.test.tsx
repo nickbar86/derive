@@ -1,14 +1,11 @@
 import { render, screen } from '@testing-library/react'
 import { RecommendedOption } from './recommended-option'
 import { useOptionsWizard } from './context'
-import { useTicker } from '@/hooks'
 
 // Mock the hooks
 jest.mock('./context')
-jest.mock('@/hooks')
 
 const mockUseOptionsWizard = useOptionsWizard as jest.MockedFunction<typeof useOptionsWizard>
-const mockUseTicker = useTicker as jest.MockedFunction<typeof useTicker>
 
 describe('RecommendedOption', () => {
   const mockCallInstrument = {
@@ -37,24 +34,21 @@ describe('RecommendedOption', () => {
           'BTC-20240321-50000-C': mockCallInstrument
         }
       },
-      isLoading: false,
+      isLoadingInstruments: false,
+      isLoadingTicker: false,
       selectedExpiry: '1710979200',
-      selectedStrike: '50000'
-    } as any)
-
-    mockUseTicker.mockReturnValue({
+      selectedStrike: '50000',
       ticker: {
         best_bid_price: '1000',
         best_ask_price: '1100'
-      },
-      isLoading: false
+      }
     } as any)
   })
 
   it('renders loading state', () => {
     mockUseOptionsWizard.mockReturnValue({
       ...mockUseOptionsWizard(),
-      isLoading: true
+      isLoadingInstruments: true
     } as any)
 
     render(<RecommendedOption />)
@@ -65,9 +59,9 @@ describe('RecommendedOption', () => {
   })
 
   it('renders loading state when ticker is loading', () => {
-    mockUseTicker.mockReturnValue({
-      ticker: null,
-      isLoading: true
+    mockUseOptionsWizard.mockReturnValue({
+      ...mockUseOptionsWizard(),
+      isLoadingTicker: true
     } as any)
 
     render(<RecommendedOption />)
@@ -79,12 +73,8 @@ describe('RecommendedOption', () => {
     mockUseOptionsWizard.mockReturnValue({
       ...mockUseOptionsWizard(),
       selectedStrike: '',
-      isLoading: false
-    } as any)
-
-    mockUseTicker.mockReturnValue({
-      ticker: null,
-      isLoading: false
+      isLoadingInstruments: false,
+      isLoadingTicker: false
     } as any)
 
     render(<RecommendedOption />)

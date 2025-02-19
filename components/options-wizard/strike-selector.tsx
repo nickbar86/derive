@@ -8,7 +8,7 @@ export function StrikeSelector() {
     selectedCurrency,
     spotPrice,
     instruments,
-    isLoading: isLoadingInstruments,
+    isLoadingInstruments,
     selectedExpiry,
     selectedStrike,
     setSelectedStrike

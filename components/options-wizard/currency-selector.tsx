@@ -5,7 +5,7 @@ import { useOptionsWizard } from './context'
 import { Skeleton } from '../ui/skeleton'
 
 export function CurrencySelector() {
-  const { currencies, selectedCurrency, setSelectedCurrency, spotPrice, isLoading } = useOptionsWizard()
+  const { currencies, selectedCurrency, setSelectedCurrency, spotPrice, isLoadingCurrencies } = useOptionsWizard()
   const selectedCurrencyData = currencies.find(c => c.currency === selectedCurrency)
   const priceChange = selectedCurrencyData
     ? Number(selectedCurrencyData.spot_price) - Number(selectedCurrencyData.spot_price_24h)
@@ -15,7 +15,7 @@ export function CurrencySelector() {
       ? ((priceChange / Number(selectedCurrencyData.spot_price_24h)) * 100).toFixed(2)
       : '0'
 
-  if (isLoading) {
+  if (isLoadingCurrencies) {
     return (
       <div>
         <div className="flex items-baseline justify-between mb-1.5">

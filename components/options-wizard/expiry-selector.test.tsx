@@ -32,7 +32,7 @@ describe('ExpirySelector', () => {
         expiryDates: mockExpiryDates,
         strikesByExpiry: mockStrikesByExpiry
       },
-      isLoading: false,
+      isLoadingInstruments: false,
       selectedExpiry: '',
       setSelectedExpiry: mockSetSelectedExpiry,
       setSelectedStrike: mockSetSelectedStrike
@@ -48,7 +48,7 @@ describe('ExpirySelector', () => {
   it('shows loading state', () => {
     mockUseOptionsWizard.mockReturnValue({
       ...mockUseOptionsWizard(),
-      isLoading: true
+      isLoadingInstruments: true
     } as any)
 
     render(<ExpirySelector />)

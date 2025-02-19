@@ -1,6 +1,5 @@
 import { Skeleton } from '../ui/skeleton'
 import formatUSD from '@/lib/format-usd'
-import { useTicker } from '@/hooks'
 import { useOptionsWizard } from './context'
 
 export function RecommendedOption() {
@@ -8,18 +7,12 @@ export function RecommendedOption() {
     selectedCurrency,
     spotPrice,
     instruments,
-    isLoading: isLoadingInstruments,
-    selectedExpiry,
-    selectedStrike
-  } = useOptionsWizard()
-
-  const { ticker, isLoading: isLoadingTicker } = useTicker(
-    selectedCurrency,
+    isLoadingInstruments,
     selectedExpiry,
     selectedStrike,
-    spotPrice,
-    instruments
-  )
+    ticker,
+    isLoadingTicker
+  } = useOptionsWizard()
 
   // Get recommended instrument based on strike vs spot price
   const getInstrumentName = (currency: string, expiry: string, strike: string, isCall: boolean) => {
@@ -70,12 +63,12 @@ export function RecommendedOption() {
             </div>
             <div className="mt-2 grid grid-cols-2 gap-2">
               <div className="p-2 bg-background rounded space-y-1">
-                <Skeleton className="h-4 w-16" data-testid="loading-skeleton" /> {/* Best Bid: */}
-                <Skeleton className="h-4 w-20" data-testid="loading-skeleton" /> {/* Price */}
+                <Skeleton className="h-4 w-16" data-testid="loading-skeleton" />
+                <Skeleton className="h-4 w-20" data-testid="loading-skeleton" />
               </div>
               <div className="p-2 bg-background rounded space-y-1">
-                <Skeleton className="h-4 w-16" data-testid="loading-skeleton" /> {/* Best Ask: */}
-                <Skeleton className="h-4 w-20" data-testid="loading-skeleton" /> {/* Price */}
+                <Skeleton className="h-4 w-16" data-testid="loading-skeleton" />
+                <Skeleton className="h-4 w-20" data-testid="loading-skeleton" />
               </div>
             </div>
           </>

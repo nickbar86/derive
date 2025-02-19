@@ -4,7 +4,6 @@ import { useMemo } from 'react'
 import formatUSD from '@/lib/format-usd'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
-import { useTicker } from '@/hooks'
 
 interface DataPoint {
   price: number
@@ -34,19 +33,11 @@ export function PayoffMatrix() {
     spotPrice,
     selectedExpiry,
     selectedStrike,
-    instruments
+    instruments,
+    ticker
   } = useOptionsWizard()
 
-  const { ticker } = useTicker(
-    selectedCurrency,
-    selectedExpiry,
-    selectedStrike,
-    spotPrice,
-    instruments
-  )
-
   const data = useMemo(() => {
-    debugger
     if (!spotPrice || !selectedStrike || !selectedExpiry || !ticker?.option_pricing) return []
 
     const strike = Number(selectedStrike)
@@ -66,7 +57,6 @@ export function PayoffMatrix() {
       }
     })
 
-    debugger
     return points
   }, [spotPrice, selectedStrike, selectedExpiry, ticker])
 
@@ -89,22 +79,6 @@ export function PayoffMatrix() {
   const isCall = Number(selectedStrike) > spotPrice
   const pricing = ticker?.option_pricing
 
-  if (!pricing) {
-    return (
-      <Card className="min-h-[450px]">
-        <CardHeader>
-          <CardTitle>Payoff & IV Analysis</CardTitle>
-          <CardDescription>Loading option data...</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="h-[350px] w-full flex items-center justify-center">
-            <Skeleton className="h-full w-full" />
-          </div>
-        </CardContent>
-      </Card>
-    )
-  }
-
   return (
     <Card className="min-h-[450px]">
       <CardHeader>
@@ -126,7 +100,7 @@ export function PayoffMatrix() {
             <LineChart 
               data={data} 
               margin={{ top: 10, right: 10, left: 10, bottom: 20 }}
-                   >
+            >
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis 
                 dataKey="price" 

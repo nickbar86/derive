@@ -28,7 +28,7 @@ describe('CurrencySelector', () => {
       selectedCurrency: 'BTC',
       setSelectedCurrency: mockSetSelectedCurrency,
       spotPrice: '50000',
-      isLoading: false
+      isLoadingCurrencies: false
     } as any)
   })
 
@@ -88,7 +88,8 @@ describe('CurrencySelector', () => {
       ],
       selectedCurrency: 'BTC',
       setSelectedCurrency: mockSetSelectedCurrency,
-      spotPrice: '50000'
+      spotPrice: '50000',
+      isLoadingCurrencies: false
     } as any)
 
     render(<CurrencySelector />)
@@ -101,7 +102,7 @@ describe('CurrencySelector', () => {
       selectedCurrency: 'BTC',
       setSelectedCurrency: mockSetSelectedCurrency,
       spotPrice: '50000',
-      isLoading: true
+      isLoadingCurrencies: true
     } as any)
 
     render(<CurrencySelector />)
