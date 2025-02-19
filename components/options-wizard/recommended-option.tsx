@@ -58,17 +58,17 @@ export function RecommendedOption() {
         {(isLoadingInstruments || isLoadingTicker) ? (
           <>
             <div className="space-y-2">
-              <Skeleton className="h-6 w-full" />
-              <Skeleton className="h-4 w-[80%]" />
+              <Skeleton data-testid="loading-skeleton" className="h-6 w-full" />
+              <Skeleton data-testid="loading-skeleton" className="h-4 w-[80%]" />
             </div>
             <div className="mt-2 grid grid-cols-2 gap-2">
               <div className="p-2 bg-background rounded space-y-1">
-                <Skeleton className="h-4 w-16" />
-                <Skeleton className="h-4 w-20" />
+                <Skeleton data-testid="loading-skeleton" className="h-4 w-16" />
+                <Skeleton data-testid="loading-skeleton" className="h-4 w-20" />
               </div>
               <div className="p-2 bg-background rounded space-y-1">
-                <Skeleton className="h-4 w-16" />
-                <Skeleton className="h-4 w-20" />
+                <Skeleton data-testid="loading-skeleton" className="h-4 w-16" />
+                <Skeleton data-testid="loading-skeleton" className="h-4 w-20" />
               </div>
             </div>
           </>

@@ -41,7 +41,7 @@ export function ExpirySelector() {
         </p>
       </div>
       {isLoadingInstruments ? (
-        <Skeleton className="h-10 w-full rounded-md" />
+        <Skeleton data-testid="expiry-loading" className="h-10 w-full rounded-md" />
       ) : (
         <Select 
           value={selectedExpiry} 

@@ -30,7 +30,7 @@ export function StrikeSelector() {
         </p>
       </div>
       {isLoadingInstruments ? (
-        <Skeleton className="h-10 w-full rounded-md" />
+        <Skeleton data-testid="strike-loading" className="h-10 w-full rounded-md" />
       ) : (
         <Select 
           value={selectedStrike} 
