@@ -2,11 +2,137 @@ import { useState, useEffect } from 'react'
 import { InstrumentPublicResponseSchema } from '@/types/public.get_instruments'
 import { SupportedCurrency } from '@/types/currencies'
 import fetchInstruments from '@/lib/api/fetch-instruments'
+import { sortedIndex, sortedIndexBy } from 'lodash'
 
 export type InstrumentsMap = {
   byName: Record<string, InstrumentPublicResponseSchema>
   expiryDates: number[]
   strikesByExpiry: Record<string, string[]>
+}
+
+export const findNearestExpiryAndStrike = (
+  sortedExpiryDates: number[],
+  strikesByExpiry: Record<string, string[]>,
+  spotPrice: number
+): { expiry: string; strike: string } => {
+  if (!sortedExpiryDates.length) return { expiry: '', strike: '' }
+
+  const currentTimestamp = Math.floor(Date.now() / 1000)
+  
+  const nearestIndex = sortedIndex(sortedExpiryDates, currentTimestamp)
+  const nearestExpiry = nearestIndex < sortedExpiryDates.length 
+    ? sortedExpiryDates[nearestIndex].toString() 
+    : sortedExpiryDates[0]?.toString() || ''
+
+  if (!nearestExpiry) return { expiry: '', strike: '' }
+  if (!strikesByExpiry[nearestExpiry]) return { expiry: nearestExpiry, strike: '' }
+
+  const strikes = strikesByExpiry[nearestExpiry].map(Number)
+  if (!strikes.length) return { expiry: nearestExpiry, strike: '' }
+
+  // Find closest strike to spot price
+  const closestIndex = sortedIndex(strikes, spotPrice)
+  // Handle edge cases (beginning/end of array)
+  const prevStrike = strikes[closestIndex - 1]
+  const nextStrike = strikes[closestIndex]
+  const closestStrike = !nextStrike ? prevStrike 
+    : !prevStrike ? nextStrike
+    : Math.abs(prevStrike - spotPrice) < Math.abs(nextStrike - spotPrice)
+      ? prevStrike 
+      : nextStrike
+
+  return { expiry: nearestExpiry, strike: closestStrike?.toString() || '' }
+}
+
+export const findClosestStrike = (strikes: string[], spotPrice: number): string => {
+  if (!strikes.length) return ''
+  
+  const strikePrices = strikes.map(Number)
+  const closestIndex = sortedIndex(strikePrices, spotPrice)
+  const prevStrike = strikePrices[closestIndex - 1]
+  const nextStrike = strikePrices[closestIndex]
+  
+  const closestStrike = !nextStrike ? prevStrike 
+    : !prevStrike ? nextStrike
+    : Math.abs(prevStrike - spotPrice) < Math.abs(nextStrike - spotPrice)
+      ? prevStrike 
+      : nextStrike
+
+  return closestStrike?.toString() || ''
+}
+
+export const processInstrumentsData = (result: InstrumentPublicResponseSchema[]): InstrumentsMap => {
+  const byName: Record<string, InstrumentPublicResponseSchema> = {}
+  const expirySet = new Set<number>()
+  const strikesByExpiry: Record<string, string[]> = {}
+
+  result.forEach(instrument => {
+    byName[instrument.instrument_name] = instrument
+    expirySet.add(instrument.option_details.expiry)
+    
+    const expiryKey = instrument.option_details.expiry.toString()
+    if (!strikesByExpiry[expiryKey]) {
+      strikesByExpiry[expiryKey] = []
+    }
+    if (!strikesByExpiry[expiryKey].includes(instrument.option_details.strike)) {
+      strikesByExpiry[expiryKey].push(instrument.option_details.strike)
+    }
+  })
+
+  const sortedExpiryDates = Array.from(expirySet).sort((a, b) => a - b)
+  Object.keys(strikesByExpiry).forEach(expiry => {
+    strikesByExpiry[expiry].sort((a, b) => Number(a) - Number(b))
+  })
+
+  return {
+    byName,
+    expiryDates: sortedExpiryDates,
+    strikesByExpiry
+  }
+}
+
+const fetchInstrumentsData = async (
+  selectedCurrency: SupportedCurrency,
+  spotPrice: number | undefined,
+  onSuccess: (data: { instruments: InstrumentsMap; expiry: string; strike: string }) => void,
+  onError: () => void,
+  isCanceled: () => boolean
+) => {
+  try {
+    const { result } = await fetchInstruments({
+      currency: selectedCurrency,
+      expired: false,
+      instrument_type: 'option'
+    })
+    
+    if (isCanceled()) return
+
+    const instrumentsMap = processInstrumentsData(result)
+    let newExpiry = ''
+    let newStrike = ''
+
+    if (spotPrice && instrumentsMap.expiryDates.length > 0) {
+      const { expiry, strike } = findNearestExpiryAndStrike(
+        instrumentsMap.expiryDates,
+        instrumentsMap.strikesByExpiry,
+        spotPrice
+      )
+      newExpiry = expiry
+      newStrike = strike
+    }
+
+    if (!isCanceled()) {
+      onSuccess({
+        instruments: instrumentsMap,
+        expiry: newExpiry,
+        strike: newStrike
+      })
+    }
+  } catch (error) {
+    if (!isCanceled()) {
+      onError()
+    }
+  }
 }
 
 export function useInstruments(selectedCurrency: SupportedCurrency, spotPrice?: number) {
@@ -24,97 +150,38 @@ export function useInstruments(selectedCurrency: SupportedCurrency, spotPrice?: 
     
     let isCanceled = false
     setIsLoading(true)
-    
-    fetchInstruments({
-      currency: selectedCurrency,
-      expired: false,
-      instrument_type: 'option'
-    }).then(({ result }) => {
-      if (isCanceled) return
 
-      const byName: Record<string, InstrumentPublicResponseSchema> = {}
-      const expirySet = new Set<number>()
-      const strikesByExpiry: Record<string, string[]> = {}
+    const handleSuccess = ({ instruments, expiry, strike }: { instruments: InstrumentsMap; expiry: string; strike: string }) => {
+      setInstruments(instruments)
+      setSelectedExpiry(expiry)
+      setSelectedStrike(strike)
+      setIsLoading(false)
+    }
 
-      result.forEach(instrument => {
-        byName[instrument.instrument_name] = instrument
-        expirySet.add(instrument.option_details.expiry)
-        
-        const expiryKey = instrument.option_details.expiry.toString()
-        if (!strikesByExpiry[expiryKey]) {
-          strikesByExpiry[expiryKey] = []
-        }
-        if (!strikesByExpiry[expiryKey].includes(instrument.option_details.strike)) {
-          strikesByExpiry[expiryKey].push(instrument.option_details.strike)
-        }
-      })
+    const handleError = () => {
+      setInstruments({ byName: {}, expiryDates: [], strikesByExpiry: {} })
+      setSelectedExpiry('')
+      setSelectedStrike('')
+      setIsLoading(false)
+    }
 
-      // Sort expiry dates and strikes
-      const sortedExpiryDates = Array.from(expirySet).sort((a, b) => a - b)
-      Object.keys(strikesByExpiry).forEach(expiry => {
-        strikesByExpiry[expiry].sort((a, b) => Number(a) - Number(b))
-      })
-
-      const instrumentsMap: InstrumentsMap = {
-        byName,
-        expiryDates: sortedExpiryDates,
-        strikesByExpiry
-      }
-
-      let newExpiry = ''
-      let newStrike = ''
-
-      if (spotPrice && sortedExpiryDates.length > 0) {
-        const currentTimestamp = Math.floor(Date.now() / 1000)
-        const nearestExpiry = sortedExpiryDates
-          .find(expiry => expiry > currentTimestamp)?.toString() || sortedExpiryDates[0].toString()
-
-        if (nearestExpiry) {
-          newExpiry = nearestExpiry
-          const strikes = strikesByExpiry[nearestExpiry].map(Number)
-          
-          if (strikes.length) {
-            const currentSpot = spotPrice
-            const closestStrike = strikes.reduce((prev, curr) => 
-              Math.abs(curr - currentSpot) < Math.abs(prev - currentSpot) ? curr : prev
-            )
-            newStrike = closestStrike.toString()
-          }
-        }
-      }
-
-      // Update everything at once
-      if (!isCanceled) {
-        setInstruments(instrumentsMap)
-        setSelectedExpiry(newExpiry)
-        setSelectedStrike(newStrike)
-        setIsLoading(false)
-      }
-    }).catch(() => {
-      if (!isCanceled) {
-        setInstruments({ byName: {}, expiryDates: [], strikesByExpiry: {} })
-        setSelectedExpiry('')
-        setSelectedStrike('')
-        setIsLoading(false)
-      }
-    })
+    fetchInstrumentsData(
+      selectedCurrency,
+      spotPrice,
+      handleSuccess,
+      handleError,
+      () => isCanceled
+    )
 
     return () => {
       isCanceled = true
     }
   }, [selectedCurrency, spotPrice])
 
-  // Add effect to handle expiry changes
   useEffect(() => {
     if (!selectedExpiry || !instruments.strikesByExpiry[selectedExpiry] || !spotPrice) return
-
-    const strikes = instruments.strikesByExpiry[selectedExpiry].map(Number)
-    if (strikes.length) {
-      const closestStrike = strikes.reduce((prev, curr) => 
-        Math.abs(curr - spotPrice) < Math.abs(prev - spotPrice) ? curr : prev
-      )
-      setSelectedStrike(closestStrike.toString())
-    }
+    const newStrike = findClosestStrike(instruments.strikesByExpiry[selectedExpiry], spotPrice)
+    setSelectedStrike(newStrike)
   }, [selectedExpiry, instruments, spotPrice])
 
   return {

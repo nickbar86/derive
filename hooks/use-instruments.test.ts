@@ -3,17 +3,10 @@ import { useInstruments } from './use-instruments'
 import fetchInstruments from '@/lib/api/fetch-instruments'
 import { SupportedCurrency } from '@/types/currencies'
 import { InstrumentType1, OptionType } from '@/types/public.get_instruments'
+import { findNearestExpiryAndStrike, findClosestStrike, processInstrumentsData } from './use-instruments'
+import { InstrumentPublicResponseSchema } from '@/types/public.get_instruments'
 
 const FIXED_TIMESTAMP = 1710892800 // March 20, 2024
-const originalDateNow = Date.now
-beforeAll(() => {
-  // Mock NOW to return a fixed timestamp
-  Date.now = jest.fn(() => FIXED_TIMESTAMP * 1000)
-})
-afterAll(() => {
-  // Restore original Date.now
-  Date.now = originalDateNow
-})
 
 jest.mock('@/lib/api/fetch-instruments')
 const mockFetchInstruments = fetchInstruments as jest.MockedFunction<typeof fetchInstruments>
@@ -63,6 +56,16 @@ const createMockInstrument = (name: string, expiry: number, strike: string) => (
   scheduled_deactivation: 0
 })
 
+beforeAll(() => {
+    jest.useFakeTimers()
+    jest.setSystemTime(FIXED_TIMESTAMP * 1000)
+  })
+  
+afterAll(() => {
+    jest.useRealTimers()
+})
+
+  
 describe('useInstruments', () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -247,5 +250,146 @@ describe('useInstruments', () => {
     })
     expect(result.current.selectedExpiry).toBe('')
     expect(result.current.selectedStrike).toBe('')
+  })
+})
+
+describe('findNearestExpiryAndStrike', () => {
+  const mockTimestamp = 1645000000 // Some fixed timestamp for testing
+  
+  beforeEach(() => {
+    jest.setSystemTime(mockTimestamp * 1000)
+  })
+
+  it('finds nearest future expiry and closest strike', () => {
+    const expiryDates = [1644900000, 1645100000, 1645200000] // One past, two future
+    const strikesByExpiry = {
+      '1645100000': ['9000', '10000', '11000'],
+    }
+    const spotPrice = 10500
+
+    const result = findNearestExpiryAndStrike(expiryDates, strikesByExpiry, spotPrice)
+    expect(result).toEqual({
+      expiry: '1645100000',
+      strike: '11000'
+    })
+  })
+
+  it('returns first expiry if no future expiry exists', () => {
+    const expiryDates = [1644900000, 1644950000] // All past
+    const strikesByExpiry = {
+      '1644900000': ['9000', '10000', '11000'],
+    }
+    const spotPrice = 10500
+
+    const result = findNearestExpiryAndStrike(expiryDates, strikesByExpiry, spotPrice)
+    expect(result).toEqual({
+      expiry: '1644900000',
+      strike: '11000'
+    })
+  })
+
+  it('handles empty strikes array', () => {
+    const expiryDates = [1645100000]
+    const strikesByExpiry = {
+      '1645100000': [],
+    }
+    const spotPrice = 10500
+
+    const result = findNearestExpiryAndStrike(expiryDates, strikesByExpiry, spotPrice)
+    expect(result).toEqual({
+      expiry: '1645100000',
+      strike: ''
+    })
+  })
+
+  it('handles empty expiry dates', () => {
+    const result = findNearestExpiryAndStrike([], {}, 10500)
+    expect(result).toEqual({
+      expiry: '',
+      strike: ''
+    })
+  })
+})
+
+describe('findClosestStrike', () => {
+  it('finds exact match', () => {
+    const strikes = ['9000', '10000', '11000']
+    const spotPrice = 10000
+
+    const result = findClosestStrike(strikes, spotPrice)
+    expect(result).toBe('10000')
+  })
+
+  it('finds closest strike when spot is between strikes', () => {
+    const strikes = ['9000', '10000', '11000']
+    const spotPrice = 10600
+
+    const result = findClosestStrike(strikes, spotPrice)
+    expect(result).toBe('11000')
+  })
+
+  it('returns first strike when spot is below all strikes', () => {
+    const strikes = ['9000', '10000', '11000']
+    const spotPrice = 8000
+
+    const result = findClosestStrike(strikes, spotPrice)
+    expect(result).toBe('9000')
+  })
+
+  it('returns last strike when spot is above all strikes', () => {
+    const strikes = ['9000', '10000', '11000']
+    const spotPrice = 12000
+
+    const result = findClosestStrike(strikes, spotPrice)
+    expect(result).toBe('11000')
+  })
+
+  it('handles empty strikes array', () => {
+    const result = findClosestStrike([], 10000)
+    expect(result).toBe('')
+  })
+})
+
+describe('processInstrumentsData', () => {
+  it('processes raw instrument data correctly', () => {
+    const mockInstruments: InstrumentPublicResponseSchema[] = [
+      {
+        instrument_name: 'BTC-1',
+        option_details: {
+          expiry: 1645100000,
+          strike: '9000'
+        }
+      },
+      {
+        instrument_name: 'BTC-2',
+        option_details: {
+          expiry: 1645100000,
+          strike: '10000'
+        }
+      },
+      {
+        instrument_name: 'BTC-3',
+        option_details: {
+          expiry: 1645200000,
+          strike: '9000'
+        }
+      }
+    ] as InstrumentPublicResponseSchema[]
+
+    const result = processInstrumentsData(mockInstruments)
+
+    expect(result.expiryDates).toEqual([1645100000, 1645200000])
+    expect(result.strikesByExpiry['1645100000']).toEqual(['9000', '10000'])
+    expect(result.strikesByExpiry['1645200000']).toEqual(['9000'])
+    expect(Object.keys(result.byName).length).toBe(3)
+  })
+
+  it('handles empty input', () => {
+    const result = processInstrumentsData([])
+    expect(result).toEqual({
+      byName: {},
+      expiryDates: [],
+      strikesByExpiry: {}
+    })
   })
 }) 
