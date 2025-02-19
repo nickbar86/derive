@@ -146,7 +146,7 @@ export function useInstruments(selectedCurrency: SupportedCurrency, spotPrice?: 
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    if (!selectedCurrency) return
+    if (!selectedCurrency || !spotPrice) return
     
     let isCanceled = false
     setIsLoading(true)
