@@ -8,24 +8,9 @@ import { Skeleton } from '@/components/ui/skeleton'
 interface DataPoint {
   price: number
   payoff: number
-  iv_bid: number
-  iv_ask: number
 }
 
-const chartConfig = {
-  payoff: {
-    label: "Payoff",
-    color: "blue",
-  },
-  iv_bid: {
-    label: "IV (Bid)",
-    color: "green",
-  },
-  iv_ask: {
-    label: "IV (Ask)",
-    color: "red", 
-  },
-} as const
+const CHART_COLOR = "blue"
 
 export function PayoffMatrix() {
   const { 
@@ -33,38 +18,44 @@ export function PayoffMatrix() {
     spotPrice,
     selectedExpiry,
     selectedStrike,
-    instruments,
     ticker
   } = useOptionsWizard()
 
-  const data = useMemo(() => {
-    if (!spotPrice || !selectedStrike || !selectedExpiry || !ticker?.option_pricing) return []
+  const data = useMemo<{ points: DataPoint[]; isCall: boolean } | { points: []; isCall: false }>(() => {
+    if (!spotPrice || !selectedStrike || !selectedExpiry || !ticker?.option_pricing) {
+      return { points: [], isCall: false }
+    }
 
     const strike = Number(selectedStrike)
     const isCall = strike > spotPrice
     const pricing = ticker.option_pricing
   
     const priceRange = spotPrice * 0.5
-    const points: DataPoint[] = Array.from({ length: 50 }, (_, i) => {
-      const price = spotPrice - priceRange + (i * (2 * priceRange / 49))
+    const numPoints = 50
+    const numIntervals = numPoints - 1
+    const minPrice = spotPrice - priceRange
+    const maxPrice = spotPrice + priceRange
+    const totalRange = maxPrice - minPrice
+    const priceStep = totalRange / numIntervals
+    
+    const points: DataPoint[] = Array.from({ length: numPoints }, (_, i) => {
+      const price = minPrice + (i * priceStep)
       return {
         price,
         payoff: isCall 
           ? Math.max(0, price - strike) 
           : Math.max(0, strike - price),
-        iv_bid: Number(pricing.bid_iv) / 100,
-        iv_ask: Number(pricing.ask_iv) / 100
       }
     })
 
-    return points
+    return { points, isCall }
   }, [spotPrice, selectedStrike, selectedExpiry, ticker])
 
-  if (!selectedCurrency || !spotPrice || !selectedStrike || !selectedExpiry) {
+  if (!data.points?.length) {
     return (
       <Card className="min-h-[450px]">
         <CardHeader>
-          <CardTitle>Payoff & IV Analysis</CardTitle>
+          <CardTitle>Option Payoff</CardTitle>
           <CardDescription>Select currency, strike, and expiry to see analysis</CardDescription>
         </CardHeader>
         <CardContent>
@@ -76,15 +67,14 @@ export function PayoffMatrix() {
     )
   }
 
-  const isCall = Number(selectedStrike) > spotPrice
   const pricing = ticker?.option_pricing
 
   return (
     <Card className="min-h-[450px]">
       <CardHeader>
-        <CardTitle>Payoff & IV Analysis</CardTitle>
+        <CardTitle>Option Payoff</CardTitle>
         <CardDescription>
-          {isCall 
+          {data.isCall 
             ? `Call option payoff at different prices`
             : `Put option payoff at different prices`}
           {pricing && (
@@ -98,7 +88,7 @@ export function PayoffMatrix() {
         <div className="h-[350px] w-full">
           <ResponsiveContainer width="100%" height="100%">
             <LineChart 
-              data={data} 
+              data={data.points} 
               margin={{ top: 10, right: 10, left: 10, bottom: 20 }}
             >
               <CartesianGrid strokeDasharray="3 3" />
@@ -117,19 +107,8 @@ export function PayoffMatrix() {
                 domain={[0, 'auto']}
                 width={60}
               />
-              <YAxis 
-                yAxisId="right" 
-                orientation="right"
-                tickFormatter={(value: number) => `${(value * 100).toFixed(1)}%`}
-                domain={[0, Math.max(Number(pricing?.ask_iv || 0), Number(pricing?.bid_iv || 0)) / 100 * 1.1]}
-                width={60}
-              />
               <Tooltip 
-                formatter={(value: number, name: string) => {
-                  if (name === 'payoff') return formatUSD(value)
-                  if (name.startsWith('iv')) return `${(value * 100).toFixed(2)}%`
-                  return value
-                }}
+                formatter={(value: number, name: string) => formatUSD(value)}
                 labelFormatter={(label: string) => `Price: ${formatUSD(Number(label))}`}
                 contentStyle={{ 
                   backgroundColor: 'hsl(var(--background))',
@@ -142,27 +121,9 @@ export function PayoffMatrix() {
                 yAxisId="left"
                 type="monotone" 
                 dataKey="payoff" 
-                stroke={chartConfig.payoff.color}
+                stroke={CHART_COLOR}
                 strokeWidth={2}
-                name={chartConfig.payoff.label}
-                dot={false}
-              />
-              <Line 
-                yAxisId="right"
-                type="monotone" 
-                dataKey="iv_ask" 
-                stroke={chartConfig.iv_ask.color}
-                strokeWidth={2}
-                name={chartConfig.iv_ask.label}
-                dot={false}
-              />
-              <Line 
-                yAxisId="right"
-                type="monotone" 
-                dataKey="iv_bid" 
-                stroke={chartConfig.iv_bid.color}
-                strokeWidth={2}
-                name={chartConfig.iv_bid.label}
+                name="Payoff"
                 dot={false}
               />
             </LineChart>
