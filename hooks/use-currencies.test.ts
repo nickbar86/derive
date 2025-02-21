@@ -1,6 +1,8 @@
-import { renderHook, act, waitFor } from '@testing-library/react'
-import { useCurrencies } from './use-currencies'
+import { act, renderHook, waitFor } from '@testing-library/react'
+
 import fetchAllCurrencies from '@/lib/api/fetch-all-currencies'
+
+import { useCurrencies } from './use-currencies'
 
 // Mock the API call
 jest.mock('@/lib/api/fetch-all-currencies')

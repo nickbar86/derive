@@ -1,10 +1,12 @@
 'use client'
 
 import React from 'react'
-import { ThemeToggle } from '../components/ui/theme-toggle'
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
-import { CurrencySelector, StrikeSelector, ExpirySelector, PayoffMatrix, RecommendedOption } from '@/components/options-wizard'
+
+import { CurrencySelector, ExpirySelector, PayoffMatrix, RecommendedOption,StrikeSelector } from '@/components/options-wizard'
 import { OptionsWizardProvider } from '@/components/options-wizard/context'
+import { Card, CardContent, CardDescription,CardHeader, CardTitle } from '@/components/ui/card'
+
+import { ThemeToggle } from '../components/ui/theme-toggle'
 
 export default function Home() {
   return (

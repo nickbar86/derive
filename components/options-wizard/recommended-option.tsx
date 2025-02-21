@@ -1,5 +1,6 @@
-import { Skeleton } from '../ui/skeleton'
 import formatUSD from '@/lib/format-usd'
+
+import { Skeleton } from '../ui/skeleton'
 import { useOptionsWizard } from './context'
 
 export function RecommendedOption() {

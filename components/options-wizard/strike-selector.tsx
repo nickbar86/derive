@@ -1,6 +1,7 @@
+import formatUSD from '@/lib/format-usd'
+
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { Skeleton } from '../ui/skeleton'
-import formatUSD from '@/lib/format-usd'
 import { useOptionsWizard } from './context'
 
 export function StrikeSelector() {

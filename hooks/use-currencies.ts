@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react'
-import { SupportedCurrency, SupportedCurrencyResponse, isSupportedCurrency } from '@/types/currencies'
+import { useEffect,useState } from 'react'
+
 import fetchAllCurrencies from '@/lib/api/fetch-all-currencies'
+import { isSupportedCurrency,SupportedCurrency, SupportedCurrencyResponse } from '@/types/currencies'
 
 export function useCurrencies() {
   const [currencies, setCurrencies] = useState<SupportedCurrencyResponse[]>([])

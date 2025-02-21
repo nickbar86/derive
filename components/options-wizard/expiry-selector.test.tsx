@@ -1,7 +1,9 @@
-import { render, screen, fireEvent } from '@testing-library/react'
-import { ExpirySelector } from './expiry-selector'
-import { useOptionsWizard } from './context'
+import { fireEvent,render, screen } from '@testing-library/react'
+
 import formatDate from '@/lib/format-date'
+
+import { useOptionsWizard } from './context'
+import { ExpirySelector } from './expiry-selector'
 
 // Mock the context hook
 jest.mock('./context')

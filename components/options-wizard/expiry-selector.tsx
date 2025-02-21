@@ -1,6 +1,7 @@
+import formatDate from '@/lib/format-date'
+
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { Skeleton } from '../ui/skeleton'
-import formatDate from '@/lib/format-date'
 import { useOptionsWizard } from './context'
 
 export function ExpirySelector() {

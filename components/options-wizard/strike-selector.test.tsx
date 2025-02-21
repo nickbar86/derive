@@ -1,7 +1,9 @@
-import { render, screen, fireEvent } from '@testing-library/react'
-import { StrikeSelector } from './strike-selector'
-import { useOptionsWizard } from './context'
+import { fireEvent,render, screen } from '@testing-library/react'
+
 import formatUSD from '@/lib/format-usd'
+
+import { useOptionsWizard } from './context'
+import { StrikeSelector } from './strike-selector'
 
 // Mock the context hook
 jest.mock('./context')

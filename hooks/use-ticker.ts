@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react'
-import { PublicGetTickerResultSchema } from '@/types/public.get_ticker'
-import { SupportedCurrency } from '@/types/currencies'
+import { useEffect,useState } from 'react'
+
 import fetchTicker from '@/lib/api/get-ticker'
-import { InstrumentsMap } from './use-instruments'
 import { formatDateYYYYMMDD } from '@/lib/format-date'
+import { SupportedCurrency } from '@/types/currencies'
+import { PublicGetTickerResultSchema } from '@/types/public.get_ticker'
+
+import { InstrumentsMap } from './use-instruments'
 
 const fetchTickerData = async (
   instrumentName: string,

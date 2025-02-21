@@ -1,10 +1,12 @@
-import { renderHook, act, waitFor } from '@testing-library/react'
-import { useInstruments } from './use-instruments'
+import { act, renderHook, waitFor } from '@testing-library/react'
+
 import fetchInstruments from '@/lib/api/fetch-instruments'
 import { SupportedCurrency } from '@/types/currencies'
 import { InstrumentType1, OptionType } from '@/types/public.get_instruments'
-import { findNearestExpiryAndStrike, findClosestStrike, processInstrumentsData } from './use-instruments'
 import { InstrumentPublicResponseSchema } from '@/types/public.get_instruments'
+
+import { useInstruments } from './use-instruments'
+import { findClosestStrike, findNearestExpiryAndStrike, processInstrumentsData } from './use-instruments'
 
 const FIXED_TIMESTAMP = 1710892800 // March 20, 2024
 

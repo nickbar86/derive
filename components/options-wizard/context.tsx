@@ -1,6 +1,6 @@
-import { createContext, useContext, PropsWithChildren } from 'react'
+import { createContext, PropsWithChildren,useContext } from 'react'
+
 import { useCurrencies, useInstruments, useTicker } from '@/hooks'
-import { SupportedCurrency } from '@/types/currencies'
 
 type OptionsWizardContextType = Omit<ReturnType<typeof useCurrencies>, 'isLoading'> & 
   Omit<ReturnType<typeof useInstruments>, 'isLoading'> & 

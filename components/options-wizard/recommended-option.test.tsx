@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react'
-import { RecommendedOption } from './recommended-option'
+
 import { useOptionsWizard } from './context'
+import { RecommendedOption } from './recommended-option'
 
 // Mock the hooks
 jest.mock('./context')

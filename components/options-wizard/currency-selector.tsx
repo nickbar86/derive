@@ -1,19 +1,16 @@
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
-import { SupportedCurrency } from '@/types/currencies'
 import formatUSD from '@/lib/format-usd'
-import { useOptionsWizard } from './context'
+import { SupportedCurrency } from '@/types/currencies'
+
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { Skeleton } from '../ui/skeleton'
+import { useOptionsWizard } from './context'
 
 export function CurrencySelector() {
-  const { currencies, selectedCurrency, setSelectedCurrency, spotPrice, isLoadingCurrencies } = useOptionsWizard()
+  const { currencies, selectedCurrency, setSelectedCurrency, isLoadingCurrencies } = useOptionsWizard()
   const selectedCurrencyData = currencies.find(c => c.currency === selectedCurrency)
   const priceChange = selectedCurrencyData
     ? Number(selectedCurrencyData.spot_price) - Number(selectedCurrencyData.spot_price_24h)
     : 0
-  const priceChangePercent =
-    selectedCurrencyData
-      ? ((priceChange / Number(selectedCurrencyData.spot_price_24h)) * 100).toFixed(2)
-      : '0'
 
   if (isLoadingCurrencies) {
     return (

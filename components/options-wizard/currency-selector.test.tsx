@@ -1,6 +1,7 @@
-import { render, screen, fireEvent } from '@testing-library/react'
-import { CurrencySelector } from './currency-selector'
+import { fireEvent,render, screen } from '@testing-library/react'
+
 import { useOptionsWizard } from './context'
+import { CurrencySelector } from './currency-selector'
 
 // Mock the context hook
 jest.mock('./context')

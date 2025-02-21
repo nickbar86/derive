@@ -1,9 +1,11 @@
-import { useOptionsWizard } from './context'
-import { Line, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, ResponsiveContainer } from 'recharts'
 import { useMemo } from 'react'
-import formatUSD from '@/lib/format-usd'
+import { CartesianGrid, Line, LineChart, ResponsiveContainer,Tooltip, XAxis, YAxis } from 'recharts'
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
+import formatUSD from '@/lib/format-usd'
+
+import { useOptionsWizard } from './context'
 
 interface DataPoint {
   price: number
@@ -14,7 +16,6 @@ const CHART_COLOR = "blue"
 
 export function PayoffMatrix() {
   const { 
-    selectedCurrency,
     spotPrice,
     selectedExpiry,
     selectedStrike,
@@ -28,7 +29,6 @@ export function PayoffMatrix() {
 
     const strike = Number(selectedStrike)
     const isCall = strike > spotPrice
-    const pricing = ticker.option_pricing
   
     const priceRange = spotPrice * 0.5
     const numPoints = 50
@@ -108,7 +108,7 @@ export function PayoffMatrix() {
                 width={60}
               />
               <Tooltip 
-                formatter={(value: number, name: string) => formatUSD(value)}
+                formatter={(value: number) => formatUSD(value)}
                 labelFormatter={(label: string) => `Price: ${formatUSD(Number(label))}`}
                 contentStyle={{ 
                   backgroundColor: 'hsl(var(--background))',

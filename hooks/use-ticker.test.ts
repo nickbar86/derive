@@ -1,10 +1,12 @@
 import { renderHook, waitFor } from '@testing-library/react'
-import { useTicker } from './use-ticker'
+
 import fetchTicker from '@/lib/api/get-ticker'
 import { SupportedCurrency } from '@/types/currencies'
-import { InstrumentsMap } from './use-instruments'
-import { PublicGetTickerResponseSchema, PublicGetTickerResultSchema } from '@/types/public.get_ticker'
 import { InstrumentPublicResponseSchema } from '@/types/public.get_instruments'
+import { PublicGetTickerResponseSchema, PublicGetTickerResultSchema } from '@/types/public.get_ticker'
+
+import { InstrumentsMap } from './use-instruments'
+import { useTicker } from './use-ticker'
 
 jest.mock('@/lib/api/get-ticker')
 const mockFetchTicker = fetchTicker as jest.MockedFunction<typeof fetchTicker>

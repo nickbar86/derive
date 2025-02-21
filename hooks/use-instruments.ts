@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react'
-import { InstrumentPublicResponseSchema } from '@/types/public.get_instruments'
-import { SupportedCurrency } from '@/types/currencies'
+import { sortedIndex } from 'lodash'
+import { useEffect, useState } from 'react'
+
 import fetchInstruments from '@/lib/api/fetch-instruments'
-import { sortedIndex, sortedIndexBy } from 'lodash'
+import { SupportedCurrency } from '@/types/currencies'
+import { InstrumentPublicResponseSchema } from '@/types/public.get_instruments'
 
 export type InstrumentsMap = {
   byName: Record<string, InstrumentPublicResponseSchema>

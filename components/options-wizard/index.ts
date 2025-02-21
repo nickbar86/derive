@@ -1,5 +1,5 @@
 export { CurrencySelector } from './currency-selector'
-export { StrikeSelector } from './strike-selector'
 export { ExpirySelector } from './expiry-selector'
-export { RecommendedOption } from './recommended-option'
 export { PayoffMatrix } from './payoff-matrix' 
+export { RecommendedOption } from './recommended-option'
+export { StrikeSelector } from './strike-selector'
