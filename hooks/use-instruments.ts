@@ -180,9 +180,13 @@ export function useInstruments(selectedCurrency: SupportedCurrency, spotPrice?: 
   }, [selectedCurrency, spotPrice])
 
   useEffect(() => {
-    if (!selectedExpiry || !instruments.strikesByExpiry[selectedExpiry] || !spotPrice) return
-    const newStrike = findClosestStrike(instruments.strikesByExpiry[selectedExpiry], spotPrice)
-    setSelectedStrike(newStrike)
+    if (!selectedExpiry || !instruments.strikesByExpiry[selectedExpiry]) return
+    
+    setSelectedStrike(prevStrike => {
+      const strikes = instruments.strikesByExpiry[selectedExpiry]
+      const comparePrice = prevStrike ? Number(prevStrike) : spotPrice || 0
+      return findClosestStrike(strikes, comparePrice)
+    })
   }, [selectedExpiry, instruments, spotPrice])
 
   return {

@@ -20,15 +20,6 @@ export function ExpirySelector() {
   // Handle expiry change and auto-select closest strike to spot price
   const handleExpiryChange = (expiry: string) => {
     setSelectedExpiry(expiry)
-    
-    const strikes = instruments.strikesByExpiry[expiry]?.map(Number) || []
-    if (strikes.length && spotPrice) {
-      // Find the strike closest to current spot price
-      const closestStrike = strikes.reduce((prev: number, curr: number) => 
-        Math.abs(curr - spotPrice) < Math.abs(prev - spotPrice) ? curr : prev
-      )
-      setSelectedStrike(closestStrike.toString())
-    }
   }
 
   return (

@@ -1,10 +1,10 @@
 'use client';
 
 import { Monitor, Moon, Sun } from "lucide-react"
-import { useTheme } from "next-themes"
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { cn } from '@/lib/utils'
+import { useTheme } from "../providers/theme-provider";
 
 const themes = [
   { value: 'light', label: 'Light', icon: Sun },
